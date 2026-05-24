@@ -2,23 +2,21 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
-export type Mode = 'professional' | 'playful' | 'minimal'
+export type Mode = 'professional' | 'playful'
 
 interface ModeContextValue {
   mode: Mode
   cycleMode: () => void
   isPlayful: boolean
-  isMinimal: boolean
 }
 
 const ModeContext = createContext<ModeContextValue>({
   mode: 'professional',
   cycleMode: () => {},
   isPlayful: false,
-  isMinimal: false,
 })
 
-const CYCLE: Mode[] = ['professional', 'playful', 'minimal']
+const CYCLE: Mode[] = ['professional', 'playful']
 
 export function ModeProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<Mode>('professional')
@@ -30,9 +28,6 @@ export function ModeProvider({ children }: { children: ReactNode }) {
     })
   }
 
-  // Keep backward-compat: toggleMode === cycleMode
-  const toggleMode = cycleMode
-
   useEffect(() => {
     document.documentElement.setAttribute('data-mode', mode)
   }, [mode])
@@ -43,7 +38,6 @@ export function ModeProvider({ children }: { children: ReactNode }) {
         mode,
         cycleMode,
         isPlayful: mode === 'playful',
-        isMinimal: mode === 'minimal',
       }}
     >
       {children}

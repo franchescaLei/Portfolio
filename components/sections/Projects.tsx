@@ -246,71 +246,11 @@ function MediaCarousel({ media, accent }: { media: ProjectMedia[]; accent: strin
    Projects (main section)
    ══════════════════════════════════════════════════════════════════════ */
 export default function Projects() {
-  const { isPlayful, isMinimal } = useMode()
+  const { isPlayful} = useMode()
   const ref = useRef<HTMLElement>(null)
   const inView = useInView(ref, { once: true, margin: '-100px' })
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
-  /* ── Minimal layout ── */
-  if (isMinimal) {
-    return (
-      <section
-        id="projects"
-        ref={ref}
-        className="section"
-        style={{ backgroundColor: 'var(--color-bg-alt)' }}
-      >
-        <div className="max-w-6xl mx-auto px-6">
-          {/* Header */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={inView ? { opacity: 1 } : {}}
-            transition={{ duration: 0.5 }}
-            className="flex items-baseline justify-between mb-12"
-          >
-            <h2
-              style={{
-                fontFamily: 'var(--font-display)',
-                fontWeight: 'var(--weight-display)' as any,
-                fontSize: 'clamp(2.5rem, 6vw, 5rem)',
-                letterSpacing: '-0.04em',
-                textTransform: 'uppercase',
-                color: 'var(--color-ink)',
-                lineHeight: 1,
-              }}
-            >
-              Work
-            </h2>
-            <span
-              style={{
-                fontFamily: 'var(--font-mono)',
-                fontSize: '10px',
-                letterSpacing: '0.18em',
-                textTransform: 'uppercase',
-                color: 'var(--color-ink-faint)',
-              }}
-            >
-              §02
-            </span>
-          </motion.div>
-
-          <div style={{ height: '1px', background: 'var(--color-border-strong)', marginBottom: '0' }} />
-
-          {/* Project rows */}
-          <div>
-            {projects.map((project, i) => (
-              <MinimalProjectRow
-                key={project.slug}
-                project={project}
-                index={i}
-                inView={inView}
-              />
-            ))}
-          </div>
-        </div>
-      </section>
-    )
-  }
 
   /* ── Default layout (professional + playful) ── */
   return (

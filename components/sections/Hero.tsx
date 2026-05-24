@@ -12,7 +12,6 @@ export default function Hero() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
   const heroRef = useRef<HTMLElement>(null)
 
-  // Cycle professional titles
   useEffect(() => {
     const interval = setInterval(() => {
       setTitleIndex(prev => (prev + 1) % TITLES.length)
@@ -20,7 +19,6 @@ export default function Hero() {
     return () => clearInterval(interval)
   }, [])
 
-  // Parallax on mouse move (professional mode only)
   useEffect(() => {
     if (isPlayful) return
     const handleMouse = (e: MouseEvent) => {
@@ -39,30 +37,25 @@ export default function Hero() {
       className="relative min-h-screen flex items-center overflow-hidden"
       style={{ backgroundColor: 'var(--color-bg)' }}
     >
-      {/* Background decorative element */}
       {!isPlayful && (
         <motion.div
           className="absolute top-1/4 right-0 w-[40vw] h-[40vw] max-w-xl rounded-full pointer-events-none"
           style={{
-            background: `radial-gradient(circle, color-mix(in srgb, var(--color-accent) 12%, transparent), transparent 70%)`,
+            background:
+              'radial-gradient(circle, color-mix(in srgb, var(--color-accent) 12%, transparent), transparent 70%)',
             filter: 'blur(60px)',
-            x: mousePos.x * 0.3,
-            y: mousePos.y * 0.3,
           }}
           animate={{ x: mousePos.x * 0.3, y: mousePos.y * 0.3 }}
           transition={{ type: 'spring', stiffness: 50, damping: 30 }}
         />
       )}
 
-      {/* Playful mode: grid lines */}
       {isPlayful && (
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            backgroundImage: `
-              linear-gradient(var(--color-border) 1px, transparent 1px),
-              linear-gradient(90deg, var(--color-border) 1px, transparent 1px)
-            `,
+            backgroundImage:
+              'linear-gradient(var(--color-border) 1px, transparent 1px), linear-gradient(90deg, var(--color-border) 1px, transparent 1px)',
             backgroundSize: '60px 60px',
             opacity: 0.4,
           }}
@@ -71,31 +64,22 @@ export default function Hero() {
 
       <div className="max-w-6xl mx-auto px-6 w-full pt-32 pb-20">
         <div className="grid lg:grid-cols-[1fr_auto] gap-12 items-center">
-          {/* Text content */}
           <div>
-            {/* Eyebrow */}
             <motion.div
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
               className="flex items-center gap-3 mb-6"
             >
-              <div
-                className="w-8 h-px"
-                style={{ background: 'var(--color-accent)' }}
-              />
+              <div className="w-8 h-px" style={{ background: 'var(--color-accent)' }} />
               <span
                 className="text-xs font-medium tracking-widest uppercase"
-                style={{
-                  color: 'var(--color-accent)',
-                  fontFamily: 'var(--font-mono)',
-                }}
+                style={{ color: 'var(--color-accent)', fontFamily: 'var(--font-mono)' }}
               >
                 Portfolio
               </span>
             </motion.div>
 
-            {/* Name */}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -112,7 +96,6 @@ export default function Hero() {
               <span style={{ color: 'var(--color-accent)' }}>Name</span>
             </motion.h1>
 
-            {/* Animated title */}
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -138,7 +121,6 @@ export default function Hero() {
               </AnimatePresence>
             </motion.div>
 
-            {/* Introduction */}
             <motion.p
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -146,12 +128,11 @@ export default function Hero() {
               className="max-w-xl text-lg leading-relaxed mb-10"
               style={{ color: 'var(--color-ink-muted)' }}
             >
-              I build software across the full spectrum — production APIs, 
-              native mobile apps, and immersive games. Engineering quality 
+              I build software across the full spectrum — production APIs,
+              native mobile apps, and immersive games. Engineering quality
               and design craft, not either/or.
             </motion.p>
 
-            {/* CTAs */}
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -181,7 +162,6 @@ export default function Hero() {
               </a>
             </motion.div>
 
-            {/* Domain pills */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -194,29 +174,23 @@ export default function Hero() {
                 { label: 'Games', icon: '◆' },
                 { label: 'Backend', icon: '◫' },
               ].map(item => (
-                <span
-                  key={item.label}
-                  className="tech-tag"
-                >
+                <span key={item.label} className="tech-tag">
                   {item.icon} {item.label}
                 </span>
               ))}
             </motion.div>
           </div>
 
-          {/* Photo placeholder */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+            animate={{ opacity: 1, scale: 1, x: mousePos.x * 0.1, y: mousePos.y * 0.1 }}
             transition={{ duration: 0.8, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="hidden lg:block"
-            style={{ x: mousePos.x * 0.1, y: mousePos.y * 0.1 }}
           >
             <PhotoFrame isPlayful={isPlayful} />
           </motion.div>
         </div>
 
-        {/* Scroll indicator */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -233,7 +207,9 @@ export default function Hero() {
             animate={{ y: [0, 8, 0] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
             className="w-px h-10"
-            style={{ background: `linear-gradient(to bottom, var(--color-accent), transparent)` }}
+            style={{
+              background: 'linear-gradient(to bottom, var(--color-accent), transparent)',
+            }}
           />
         </motion.div>
       </div>
@@ -244,25 +220,34 @@ export default function Hero() {
 function PhotoFrame({ isPlayful }: { isPlayful: boolean }) {
   return (
     <div className="relative w-72 h-80">
-      {/* Decorative frame */}
       <div
         className="absolute inset-0 rounded-2xl border-2 translate-x-3 translate-y-3"
         style={{ borderColor: 'var(--color-accent)', opacity: 0.4 }}
       />
-
-      {/* Photo container */}
       <div
         className="relative w-full h-full rounded-2xl overflow-hidden border-2"
         style={{ borderColor: 'var(--color-border-strong)' }}
       >
-        {/* Replace with: <Image src="/images/profile.jpg" alt="Your Name" fill className="object-cover" /> */}
+        {/*
+          To add your photo:
+          1. Put your image at: public/images/profile.jpg
+          2. Replace the entire div below (the one with backgroundColor bg-alt) with:
+             <img
+               src="/images/profile.jpg"
+               alt="Your Name"
+               style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+             />
+        */}
         <div
           className="w-full h-full flex flex-col items-center justify-center gap-2"
           style={{ backgroundColor: 'var(--color-bg-alt)' }}
         >
           <div
             className="w-20 h-20 rounded-full border-2 flex items-center justify-center text-3xl"
-            style={{ borderColor: 'var(--color-border-strong)', color: 'var(--color-ink-faint)' }}
+            style={{
+              borderColor: 'var(--color-border-strong)',
+              color: 'var(--color-ink-faint)',
+            }}
           >
             👤
           </div>
@@ -274,24 +259,17 @@ function PhotoFrame({ isPlayful }: { isPlayful: boolean }) {
           </p>
         </div>
 
-        {/* Playful mode: scanline overlay */}
         {isPlayful && (
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              background: `repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                rgba(155, 74, 255, 0.05) 2px,
-                rgba(155, 74, 255, 0.05) 4px
-              )`,
+              background:
+                'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(155, 74, 255, 0.05) 2px, rgba(155, 74, 255, 0.05) 4px)',
             }}
           />
         )}
       </div>
 
-      {/* Floating badge */}
       <motion.div
         animate={{ y: [0, -6, 0] }}
         transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
@@ -301,7 +279,10 @@ function PhotoFrame({ isPlayful }: { isPlayful: boolean }) {
           borderColor: 'var(--color-border)',
         }}
       >
-        <p className="text-xs font-medium" style={{ color: 'var(--color-ink)', fontFamily: 'var(--font-mono)' }}>
+        <p
+          className="text-xs font-medium"
+          style={{ color: 'var(--color-ink)', fontFamily: 'var(--font-mono)' }}
+        >
           ✦ Available for work
         </p>
       </motion.div>

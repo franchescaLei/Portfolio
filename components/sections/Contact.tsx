@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { useMode } from '@/components/ui/ModeProvider'
 
+// EDIT: Update all href, label, and sublabel values to your own links
 const CONTACT_LINKS = [
   {
     id: 'github',
@@ -41,7 +42,7 @@ const CONTACT_LINKS = [
         <polyline points="22,6 12,13 2,6"/>
       </svg>
     ),
-    accent: '#C8A96E',
+    accent: '#D4583A',
   },
   {
     id: 'phone',
@@ -53,7 +54,7 @@ const CONTACT_LINKS = [
         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2.24h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.18 6.18l1.77-1.77a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
       </svg>
     ),
-    accent: '#3ECFB2',
+    accent: '#D4583A',
   },
 ]
 
@@ -71,7 +72,6 @@ export default function Contact() {
       style={{ backgroundColor: 'var(--color-bg)' }}
     >
       <div className="max-w-6xl mx-auto px-6">
-        {/* Section header */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -87,6 +87,7 @@ export default function Contact() {
               Contact
             </span>
           </div>
+          {/* EDIT: Update heading to your own voice if you like */}
           <h2
             className="font-display font-bold"
             style={{
@@ -103,18 +104,18 @@ export default function Contact() {
         </motion.div>
 
         <div className="grid lg:grid-cols-[1fr_1fr] gap-16 items-start">
-          {/* Left: copy */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
           >
+            {/* EDIT: Update this copy to describe your availability/situation */}
             <p
               className="text-lg leading-relaxed mb-6"
               style={{ color: 'var(--color-ink-muted)' }}
             >
-              Whether you're looking for a developer who can own a project 
-              end to end, contribute to a team, or build something new — 
+              Whether you're looking for a developer who can own a project
+              end to end, contribute to a team, or build something new —
               I'm open to hearing about it.
             </p>
             <p
@@ -124,7 +125,6 @@ export default function Contact() {
               Based in the Philippines. Open to remote opportunities.
             </p>
 
-            {/* Availability indicator */}
             <div
               className="flex items-center gap-3 mt-8 px-5 py-3 rounded-xl border w-fit"
               style={{
@@ -136,6 +136,7 @@ export default function Contact() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
               </span>
+              {/* EDIT: Change or remove this if you're not available */}
               <span
                 className="text-sm font-medium"
                 style={{ color: 'var(--color-ink)', fontFamily: 'var(--font-mono)' }}
@@ -145,7 +146,6 @@ export default function Contact() {
             </div>
           </motion.div>
 
-          {/* Right: contact links */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -165,16 +165,11 @@ export default function Contact() {
                 onMouseLeave={() => setHoveredId(null)}
                 className="flex items-center gap-5 p-5 rounded-xl border transition-all duration-300"
                 style={{
-                  borderColor: hoveredId === link.id
-                    ? `${link.accent}60`
-                    : 'var(--color-border)',
-                  backgroundColor: hoveredId === link.id
-                    ? `${link.accent}08`
-                    : 'var(--color-surface)',
+                  borderColor: hoveredId === link.id ? `${link.accent}60` : 'var(--color-border)',
+                  backgroundColor: hoveredId === link.id ? `${link.accent}08` : 'var(--color-surface)',
                   textDecoration: 'none',
                 }}
               >
-                {/* Icon container */}
                 <div
                   className="w-11 h-11 rounded-lg flex items-center justify-center flex-shrink-0 transition-all duration-300"
                   style={{
@@ -184,8 +179,6 @@ export default function Contact() {
                 >
                   {link.icon}
                 </div>
-
-                {/* Text */}
                 <div className="flex-1 min-w-0">
                   <p
                     className="font-medium text-sm transition-colors duration-300"
@@ -200,8 +193,6 @@ export default function Contact() {
                     {link.sublabel}
                   </p>
                 </div>
-
-                {/* Arrow */}
                 <motion.span
                   animate={{ x: hoveredId === link.id ? 4 : 0 }}
                   transition={{ duration: 0.2 }}
