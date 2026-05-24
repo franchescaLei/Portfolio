@@ -91,9 +91,9 @@ export default function Hero() {
                 letterSpacing: '-0.03em',
               }}
             >
-              Your
+              Franchesca Lei
               <br />
-              <span style={{ color: 'var(--color-accent)' }}>Name</span>
+              <span style={{ color: 'var(--color-accent)' }}>Demisana</span>
             </motion.h1>
 
             <motion.div
@@ -218,58 +218,105 @@ export default function Hero() {
 }
 
 function PhotoFrame({ isPlayful }: { isPlayful: boolean }) {
+  const [isHovered, setIsHovered] = useState(false)
+
   return (
     <div className="relative w-72 h-80">
+      {/* Decorative frame */}
       <div
         className="absolute inset-0 rounded-2xl border-2 translate-x-3 translate-y-3"
         style={{ borderColor: 'var(--color-accent)', opacity: 0.4 }}
       />
+
+      {/* Photo container */}
       <div
         className="relative w-full h-full rounded-2xl overflow-hidden border-2"
         style={{ borderColor: 'var(--color-border-strong)' }}
+        onMouseEnter={() => isPlayful && setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
-        {/*
-          To add your photo:
-          1. Put your image at: public/images/profile.jpg
-          2. Replace the entire div below (the one with backgroundColor bg-alt) with:
-             <img
-               src="/images/profile.jpg"
-               alt="Your Name"
-               style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-             />
-        */}
-        <div
-          className="w-full h-full flex flex-col items-center justify-center gap-2"
-          style={{ backgroundColor: 'var(--color-bg-alt)' }}
-        >
-          <div
-            className="w-20 h-20 rounded-full border-2 flex items-center justify-center text-3xl"
-            style={{
-              borderColor: 'var(--color-border-strong)',
-              color: 'var(--color-ink-faint)',
-            }}
-          >
-            👤
-          </div>
-          <p
-            className="text-xs"
-            style={{ color: 'var(--color-ink-faint)', fontFamily: 'var(--font-mono)' }}
-          >
-            Add profile.jpg
-          </p>
-        </div>
+        {/* Default image */}
+        <img
+          src="/images/profile.jpg"
+          alt="Your Name"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'block',
+            position: 'absolute',
+            inset: 0,
+            transition: 'opacity 0.35s ease',
+            opacity: isHovered ? 0 : 1,
+          }}
+        />
 
+        {/* Hover image — playful mode only */}
+        {isPlayful && (
+          <img
+            src="/images/profile-hover.jpg"
+            alt="alternate"
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              display: 'block',
+              position: 'absolute',
+              inset: 0,
+              transition: 'opacity 0.35s ease',
+              opacity: isHovered ? 1 : 0,
+            }}
+          />
+        )}
+
+        {/* Scanline overlay — playful mode only */}
         {isPlayful && (
           <div
             className="absolute inset-0 pointer-events-none"
             style={{
-              background:
-                'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(155, 74, 255, 0.05) 2px, rgba(155, 74, 255, 0.05) 4px)',
+              background: `repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(155, 74, 255, 0.05) 2px,
+                rgba(155, 74, 255, 0.05) 4px
+              )`,
+              zIndex: 10,
             }}
           />
         )}
+
+        {/* Hover label — playful mode only */}
+        {isPlayful && (
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              padding: '8px 12px',
+              background: 'rgba(155, 74, 255, 0.75)',
+              backdropFilter: 'blur(4px)',
+              transition: 'opacity 0.35s ease',
+              opacity: isHovered ? 1 : 0,
+              zIndex: 20,
+              textAlign: 'center',
+            }}
+          >
+            <span style={{
+              color: '#fff',
+              fontSize: '11px',
+              fontFamily: 'var(--font-mono)',
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+            }}>
+              ✦ surprise
+            </span>
+          </div>
+        )}
       </div>
 
+      {/* Floating badge */}
       <motion.div
         animate={{ y: [0, -6, 0] }}
         transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
@@ -279,10 +326,7 @@ function PhotoFrame({ isPlayful }: { isPlayful: boolean }) {
           borderColor: 'var(--color-border)',
         }}
       >
-        <p
-          className="text-xs font-medium"
-          style={{ color: 'var(--color-ink)', fontFamily: 'var(--font-mono)' }}
-        >
+        <p className="text-xs font-medium" style={{ color: 'var(--color-ink)', fontFamily: 'var(--font-mono)' }}>
           ✦ Available for work
         </p>
       </motion.div>

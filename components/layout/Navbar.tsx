@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useMode, type Mode } from '@/components/ui/ModeProvider'
 import { cn } from '@/lib/utils'
@@ -49,7 +49,7 @@ export default function Navbar() {
           className="font-display text-lg font-semibold tracking-tight"
           style={{ color: 'var(--color-ink)' }}
         >
-          <span style={{ color: 'var(--color-accent)' }}>Y</span>our Name
+           <span style={{ color: 'var(--color-accent)' }}>Franchesca Lei T. Demisana</span> 
         </a>
 
         <nav className="hidden md:flex items-center gap-8">
