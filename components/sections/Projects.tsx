@@ -1,23 +1,318 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useCallback, useEffect } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import { useMode } from '@/components/ui/ModeProvider'
 import { projects } from '@/lib/projects'
-import type { Project } from '@/lib/projects'
+import type { Project, ProjectMedia } from '@/lib/projects'
 
 const CATEGORY_ICONS: Record<string, string> = {
-  web: '◈',
+  web:    '◈',
   mobile: '◉',
-  game: '◆',
+  game:   '◆',
 }
 
+/* ══════════════════════════════════════════════════════════════════════
+   MediaCarousel
+   Renders a horizontal slider supporting video and image items.
+   ══════════════════════════════════════════════════════════════════════ */
+function MediaCarousel({ media, accent }: { media: ProjectMedia[]; accent: string }) {
+  const [current, setCurrent] = useState(0)
+
+  const prev = useCallback(() => setCurrent(i => (i - 1 + media.length) % media.length), [media.length])
+  const next = useCallback(() => setCurrent(i => (i + 1) % media.length), [media.length])
+
+  // Keyboard navigation when carousel is focused
+  const handleKey = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowLeft') prev()
+    if (e.key === 'ArrowRight') next()
+  }
+
+  const item = media[current]
+
+  return (
+    <div
+      className="rounded-xl overflow-hidden"
+      style={{ border: `1px solid var(--color-border)` }}
+      onKeyDown={handleKey}
+      tabIndex={0}
+      aria-label="Project media carousel"
+    >
+      {/* Main media area */}
+      <div
+        className="relative w-full"
+        style={{ backgroundColor: '#000', aspectRatio: '16/9' }}
+      >
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={current}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            {item.type === 'video' ? (
+              <video
+                src={item.src}
+                poster={item.poster}
+                controls
+                playsInline
+                preload="metadata"
+                style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+              />
+            ) : (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={item.src}
+                alt={item.caption ?? `Project screenshot ${current + 1}`}
+                style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+              />
+            )}
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Type badge */}
+        <div
+          className="absolute top-3 left-3 flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-mono"
+          style={{
+            backgroundColor: 'rgba(0,0,0,0.65)',
+            backdropFilter: 'blur(8px)',
+            color: item.type === 'video' ? accent : '#fff',
+            letterSpacing: '0.06em',
+          }}
+        >
+          {item.type === 'video' ? '▶ Video' : '◻ Image'}
+        </div>
+
+        {/* Prev / Next arrows — only if more than 1 item */}
+        {media.length > 1 && (
+          <>
+            <button
+              onClick={prev}
+              aria-label="Previous"
+              style={{
+                position: 'absolute',
+                left: 12,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: 36,
+                height: 36,
+                borderRadius: '50%',
+                border: 'none',
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                backdropFilter: 'blur(6px)',
+                color: '#fff',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 16,
+                transition: 'background 0.2s',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = `${accent}CC`)}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.5)')}
+            >
+              ‹
+            </button>
+            <button
+              onClick={next}
+              aria-label="Next"
+              style={{
+                position: 'absolute',
+                right: 12,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: 36,
+                height: 36,
+                borderRadius: '50%',
+                border: 'none',
+                backgroundColor: 'rgba(0,0,0,0.5)',
+                backdropFilter: 'blur(6px)',
+                color: '#fff',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 16,
+                transition: 'background 0.2s',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = `${accent}CC`)}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.5)')}
+            >
+              ›
+            </button>
+          </>
+        )}
+
+        {/* Counter */}
+        {media.length > 1 && (
+          <div
+            className="absolute bottom-3 right-3 text-xs font-mono"
+            style={{
+              backgroundColor: 'rgba(0,0,0,0.55)',
+              backdropFilter: 'blur(6px)',
+              color: '#fff',
+              padding: '2px 8px',
+              borderRadius: 4,
+              letterSpacing: '0.06em',
+            }}
+          >
+            {current + 1} / {media.length}
+          </div>
+        )}
+      </div>
+
+      {/* Caption */}
+      {item.caption && (
+        <div
+          className="px-4 py-2.5 text-xs font-mono"
+          style={{
+            color: 'var(--color-ink-faint)',
+            borderTop: '1px solid var(--color-border)',
+            letterSpacing: '0.04em',
+          }}
+        >
+          {item.caption}
+        </div>
+      )}
+
+      {/* Thumbnail strip — only if 2+ items */}
+      {media.length > 1 && (
+        <div
+          className="flex gap-2 px-4 py-3 overflow-x-auto"
+          style={{ borderTop: '1px solid var(--color-border)' }}
+        >
+          {media.map((m, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrent(i)}
+              aria-label={`Go to slide ${i + 1}`}
+              style={{
+                flexShrink: 0,
+                width: 56,
+                height: 36,
+                borderRadius: 6,
+                overflow: 'hidden',
+                border: `2px solid ${i === current ? accent : 'transparent'}`,
+                cursor: 'pointer',
+                background: '#000',
+                padding: 0,
+                transition: 'border-color 0.2s',
+              }}
+            >
+              {m.type === 'video' ? (
+                // Poster or dark placeholder for video thumbnails
+                m.poster ? (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={m.poster}
+                    alt=""
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  />
+                ) : (
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 14,
+                      color: i === current ? accent : '#666',
+                    }}
+                  >
+                    ▶
+                  </div>
+                )
+              ) : (
+                /* eslint-disable-next-line @next/next/no-img-element */
+                <img
+                  src={m.src}
+                  alt=""
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                />
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   Projects (main section)
+   ══════════════════════════════════════════════════════════════════════ */
 export default function Projects() {
-  const { isPlayful } = useMode()
+  const { isPlayful, isMinimal } = useMode()
   const ref = useRef<HTMLElement>(null)
   const inView = useInView(ref, { once: true, margin: '-100px' })
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
+  /* ── Minimal layout ── */
+  if (isMinimal) {
+    return (
+      <section
+        id="projects"
+        ref={ref}
+        className="section"
+        style={{ backgroundColor: 'var(--color-bg-alt)' }}
+      >
+        <div className="max-w-6xl mx-auto px-6">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={inView ? { opacity: 1 } : {}}
+            transition={{ duration: 0.5 }}
+            className="flex items-baseline justify-between mb-12"
+          >
+            <h2
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontWeight: 'var(--weight-display)' as any,
+                fontSize: 'clamp(2.5rem, 6vw, 5rem)',
+                letterSpacing: '-0.04em',
+                textTransform: 'uppercase',
+                color: 'var(--color-ink)',
+                lineHeight: 1,
+              }}
+            >
+              Work
+            </h2>
+            <span
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '10px',
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                color: 'var(--color-ink-faint)',
+              }}
+            >
+              §02
+            </span>
+          </motion.div>
+
+          <div style={{ height: '1px', background: 'var(--color-border-strong)', marginBottom: '0' }} />
+
+          {/* Project rows */}
+          <div>
+            {projects.map((project, i) => (
+              <MinimalProjectRow
+                key={project.slug}
+                project={project}
+                index={i}
+                inView={inView}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  /* ── Default layout (professional + playful) ── */
   return (
     <section
       id="projects"
@@ -86,6 +381,226 @@ export default function Projects() {
   )
 }
 
+
+/* ══════════════════════════════════════════════════════════════════════
+   MinimalProjectRow — editorial list-row layout
+   ══════════════════════════════════════════════════════════════════════ */
+function MinimalProjectRow({
+  project,
+  index,
+  inView,
+}: {
+  project: Project
+  index: number
+  inView: boolean
+}) {
+  const [expanded, setExpanded] = useState(false)
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={inView ? { opacity: 1 } : {}}
+      transition={{ duration: 0.4, delay: index * 0.08 }}
+    >
+      {/* Row header — click to expand */}
+      <div
+        onClick={() => setExpanded(!expanded)}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '40px 1fr auto',
+          gap: '24px',
+          alignItems: 'center',
+          padding: '24px 0',
+          borderBottom: '1px solid var(--color-border)',
+          cursor: 'pointer',
+        }}
+        role="button"
+        aria-expanded={expanded}
+      >
+        {/* Index */}
+        <span
+          style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: '10px',
+            letterSpacing: '0.12em',
+            color: 'var(--color-ink-faint)',
+          }}
+        >
+          {String(index + 1).padStart(2, '0')}
+        </span>
+
+        {/* Title + meta */}
+        <div>
+          <p
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontWeight: 700,
+              fontSize: 'clamp(1.2rem, 2.5vw, 1.8rem)',
+              letterSpacing: '-0.03em',
+              textTransform: 'uppercase',
+              color: 'var(--color-ink)',
+              lineHeight: 1,
+              marginBottom: '6px',
+            }}
+          >
+            {project.title}
+          </p>
+          <div className="flex flex-wrap items-center gap-3">
+            <span
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '9px',
+                letterSpacing: '0.15em',
+                textTransform: 'uppercase',
+                color: project.accent,
+              }}
+            >
+              {project.categoryLabel}
+            </span>
+            <span style={{ color: 'var(--color-border-strong)' }}>·</span>
+            <span
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '9px',
+                letterSpacing: '0.15em',
+                textTransform: 'uppercase',
+                color: 'var(--color-ink-faint)',
+              }}
+            >
+              {project.year}
+            </span>
+          </div>
+        </div>
+
+        {/* Toggle + links */}
+        <div className="flex items-center gap-4">
+          {project.githubUrl && (
+            <a
+              href={project.githubUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={e => e.stopPropagation()}
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: '9px',
+                letterSpacing: '0.15em',
+                textTransform: 'uppercase',
+                color: 'var(--color-ink-faint)',
+                textDecoration: 'none',
+                transition: 'color 0.2s',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--color-ink)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--color-ink-faint)')}
+            >
+              GH ↗
+            </a>
+          )}
+          <span
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: '14px',
+              color: 'var(--color-ink-faint)',
+              transform: expanded ? 'rotate(45deg)' : 'rotate(0deg)',
+              transition: 'transform 0.25s ease',
+              display: 'inline-block',
+            }}
+          >
+            +
+          </span>
+        </div>
+      </div>
+
+      {/* Expandable body */}
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div style={{ padding: '32px 0 40px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
+              {/* Media carousel */}
+              {project.media && project.media.length > 0 && (
+                <MediaCarousel media={project.media} accent={project.accent} />
+              )}
+
+              <div className="grid lg:grid-cols-[1fr_1fr] gap-12">
+                {/* Description */}
+                <div>
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '9px',
+                      letterSpacing: '0.18em',
+                      textTransform: 'uppercase',
+                      color: 'var(--color-ink-faint)',
+                      marginBottom: '12px',
+                    }}
+                  >
+                    Overview
+                  </p>
+                  <p style={{ color: 'var(--color-ink-muted)', lineHeight: 1.7, fontSize: '14px' }}>
+                    {project.description}
+                  </p>
+
+                  {/* Stack */}
+                  <div style={{ marginTop: '20px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                    {project.stack.map(tech => (
+                      <span key={tech} className="tech-tag">{tech}</span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Highlights */}
+                <div>
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '9px',
+                      letterSpacing: '0.18em',
+                      textTransform: 'uppercase',
+                      color: 'var(--color-ink-faint)',
+                      marginBottom: '12px',
+                    }}
+                  >
+                    Key Highlights
+                  </p>
+                  <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {project.highlights.map((h, i) => (
+                      <li
+                        key={i}
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: '16px 1fr',
+                          gap: '10px',
+                          fontSize: '13px',
+                          color: 'var(--color-ink-muted)',
+                          lineHeight: 1.6,
+                          borderTop: i === 0 ? 'none' : '1px solid var(--color-border)',
+                          paddingTop: i === 0 ? 0 : '10px',
+                        }}
+                      >
+                        <span style={{ color: project.accent, fontFamily: 'var(--font-mono)', fontSize: '11px', marginTop: '2px' }}>›</span>
+                        {h}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  )
+}
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   ProjectCard — default (professional + playful) card layout
+   ══════════════════════════════════════════════════════════════════════ */
 function ProjectCard({
   project,
   index,
@@ -121,9 +636,7 @@ function ProjectCard({
       onMouseLeave={onLeave}
       className="group relative rounded-2xl border overflow-hidden cursor-pointer"
       style={{
-        borderColor: isHovered
-          ? `${project.accent}50`
-          : 'var(--color-border)',
+        borderColor: isHovered ? `${project.accent}50` : 'var(--color-border)',
         backgroundColor: 'var(--color-surface)',
         transition: 'all 0.4s cubic-bezier(0.16,1,0.3,1)',
         boxShadow: isHovered
@@ -145,7 +658,6 @@ function ProjectCard({
         {/* Header row */}
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
           <div className="flex items-start gap-4">
-            {/* Index + category */}
             <div className="flex flex-col items-center gap-1 pt-1 min-w-[2.5rem]">
               <span
                 className="text-3xl font-display font-bold"
@@ -154,9 +666,7 @@ function ProjectCard({
                 {String(index + 1).padStart(2, '0')}
               </span>
             </div>
-
             <div>
-              {/* Category pill */}
               <span
                 className="inline-flex items-center gap-1.5 text-xs font-medium tracking-widest uppercase mb-2"
                 style={{ color: project.accent, fontFamily: 'var(--font-mono)' }}
@@ -165,11 +675,7 @@ function ProjectCard({
               </span>
               <h3
                 className="font-display font-bold text-2xl md:text-3xl"
-                style={{
-                  color: 'var(--color-ink)',
-                  letterSpacing: '-0.02em',
-                  lineHeight: 1.1,
-                }}
+                style={{ color: 'var(--color-ink)', letterSpacing: '-0.02em', lineHeight: 1.1 }}
               >
                 {project.title}
               </h3>
@@ -190,7 +696,7 @@ function ProjectCard({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={e => e.stopPropagation()}
-                className="flex items-center gap-2 text-xs px-4 py-2 rounded-full border transition-all duration-200 hover:border-current"
+                className="flex items-center gap-2 text-xs px-4 py-2 rounded-full border transition-all duration-200"
                 style={{
                   borderColor: 'var(--color-border-strong)',
                   color: 'var(--color-ink-muted)',
@@ -207,10 +713,7 @@ function ProjectCard({
                 rel="noopener noreferrer"
                 onClick={e => e.stopPropagation()}
                 className="flex items-center gap-2 text-xs px-4 py-2 rounded-full text-white transition-all duration-200"
-                style={{
-                  backgroundColor: project.accent,
-                  fontFamily: 'var(--font-mono)',
-                }}
+                style={{ backgroundColor: project.accent, fontFamily: 'var(--font-mono)' }}
               >
                 Live Demo ↗
               </a>
@@ -232,9 +735,7 @@ function ProjectCard({
             <span
               key={tech}
               className="tech-tag"
-              style={{
-                borderColor: isHovered ? `${project.accent}40` : undefined,
-              }}
+              style={{ borderColor: isHovered ? `${project.accent}40` : undefined }}
             >
               {tech}
             </span>
@@ -250,10 +751,10 @@ function ProjectCard({
           <motion.span animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.3 }}>
             ↓
           </motion.span>
-          {expanded ? 'Show less' : 'Key highlights'}
+          {expanded ? 'Show less' : 'Media & highlights'}
         </motion.button>
 
-        {/* Expandable highlights */}
+        {/* Expandable section */}
         <AnimatePresence>
           {expanded && (
             <motion.div
@@ -263,31 +764,52 @@ function ProjectCard({
               transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
               className="overflow-hidden"
             >
-              <div className="pt-6 mt-6 border-t" style={{ borderColor: 'var(--color-border)' }}>
-                <ul className="space-y-3">
-                  {project.highlights.map((highlight, hi) => (
-                    <motion.li
-                      key={hi}
-                      initial={{ opacity: 0, x: -12 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: hi * 0.05, duration: 0.4 }}
-                      className="flex items-start gap-3 text-sm"
-                      style={{ color: 'var(--color-ink-muted)' }}
+              <div className="pt-6 mt-6 border-t space-y-6" style={{ borderColor: 'var(--color-border)' }}>
+
+                {/* ── Media carousel ── */}
+                {project.media && project.media.length > 0 && (
+                  <div onClick={e => e.stopPropagation()}>
+                    <p
+                      className="text-xs font-mono mb-3"
+                      style={{ color: 'var(--color-ink-faint)', letterSpacing: '0.08em', textTransform: 'uppercase' }}
                     >
-                      <span style={{ color: project.accent, flexShrink: 0, marginTop: '2px' }}>
-                        ›
-                      </span>
-                      {highlight}
-                    </motion.li>
-                  ))}
-                </ul>
+                      Media
+                    </p>
+                    <MediaCarousel media={project.media} accent={project.accent} />
+                  </div>
+                )}
+
+                {/* ── Highlights ── */}
+                <div>
+                  <p
+                    className="text-xs font-mono mb-3"
+                    style={{ color: 'var(--color-ink-faint)', letterSpacing: '0.08em', textTransform: 'uppercase' }}
+                  >
+                    Key Highlights
+                  </p>
+                  <ul className="space-y-3">
+                    {project.highlights.map((highlight, hi) => (
+                      <motion.li
+                        key={hi}
+                        initial={{ opacity: 0, x: -12 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: hi * 0.04, duration: 0.35 }}
+                        className="flex items-start gap-3 text-sm"
+                        style={{ color: 'var(--color-ink-muted)' }}
+                      >
+                        <span style={{ color: project.accent, flexShrink: 0, marginTop: '2px' }}>›</span>
+                        {highlight}
+                      </motion.li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      {/* Playful mode: corner accent */}
+      {/* Playful: corner dot */}
       {isPlayful && (
         <div
           className="absolute top-4 right-4 w-2 h-2 rounded-full"

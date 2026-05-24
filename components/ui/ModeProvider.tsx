@@ -2,36 +2,50 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
-type Mode = 'professional' | 'playful'
+export type Mode = 'professional' | 'playful' | 'minimal'
 
 interface ModeContextValue {
   mode: Mode
-  toggleMode: () => void
+  cycleMode: () => void
   isPlayful: boolean
+  isMinimal: boolean
 }
 
 const ModeContext = createContext<ModeContextValue>({
   mode: 'professional',
-  toggleMode: () => {},
+  cycleMode: () => {},
   isPlayful: false,
+  isMinimal: false,
 })
+
+const CYCLE: Mode[] = ['professional', 'playful', 'minimal']
 
 export function ModeProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<Mode>('professional')
 
-  const toggleMode = () => {
-    setMode(prev => prev === 'professional' ? 'playful' : 'professional')
+  const cycleMode = () => {
+    setMode(prev => {
+      const idx = CYCLE.indexOf(prev)
+      return CYCLE[(idx + 1) % CYCLE.length]
+    })
   }
 
+  // Keep backward-compat: toggleMode === cycleMode
+  const toggleMode = cycleMode
+
   useEffect(() => {
-    document.documentElement.setAttribute(
-      'data-mode',
-      mode === 'playful' ? 'playful' : 'professional'
-    )
+    document.documentElement.setAttribute('data-mode', mode)
   }, [mode])
 
   return (
-    <ModeContext.Provider value={{ mode, toggleMode, isPlayful: mode === 'playful' }}>
+    <ModeContext.Provider
+      value={{
+        mode,
+        cycleMode,
+        isPlayful: mode === 'playful',
+        isMinimal: mode === 'minimal',
+      }}
+    >
       {children}
     </ModeContext.Provider>
   )

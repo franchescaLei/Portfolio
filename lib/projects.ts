@@ -1,3 +1,10 @@
+export interface ProjectMedia {
+  type: 'video' | 'image'
+  src: string
+  poster?: string   // for video: thumbnail image
+  caption?: string
+}
+
 export interface Project {
   slug: string
   title: string
@@ -8,6 +15,7 @@ export interface Project {
   longDescription: string
   stack: string[]
   highlights: string[]
+  media: ProjectMedia[]   // video + images for the carousel
   image: string
   accent: string
   accentDark: string
@@ -34,7 +42,7 @@ Every board change, comment, and notification is pushed to all connected clients
     stack: [
       'React', 'TypeScript', 'Vite', 'SignalR',
       'ASP.NET Core 9', 'Entity Framework Core', 'SQL Server',
-      'MSSQL', 'C#', 'REST API'
+      'Node.js', 'C#', 'REST API', 'Scalar',
     ],
     highlights: [
       'Dual SignalR hub architecture — board events and user notifications on separate persistent connections',
@@ -45,6 +53,32 @@ Every board change, comment, and notification is pushed to all connected clients
       'Transactional audit logging — no data mutation occurs without a corresponding audit record',
       'PBKDF2-SHA256 with versioned hash format supporting future algorithm migration',
       'EF-level hierarchy rule enforcement as SaveChanges interceptor',
+    ],
+    // Replace src values with your actual video/image paths once you have them.
+    // Videos: put files in /public/media/scrum-board/
+    // Images: put files in /public/images/projects/scrum-board/
+    media: [
+      {
+        type: 'video',
+        src: '/media/scrum-board/demo.mp4',
+        poster: '/images/projects/scrum-board/poster.jpg',
+        caption: 'Full walkthrough — board, sprints, and real-time sync',
+      },
+      {
+        type: 'image',
+        src: '/images/projects/scrum-board/kanban.jpg',
+        caption: 'Drag-and-drop Kanban board',
+      },
+      {
+        type: 'image',
+        src: '/images/projects/scrum-board/sprint.jpg',
+        caption: 'Sprint planning view',
+      },
+      {
+        type: 'image',
+        src: '/images/projects/scrum-board/auth.jpg',
+        caption: 'Role-based auth gate',
+      },
     ],
     image: '/images/projects/scrum-board.jpg',
     accent: '#4A7AFF',
@@ -69,7 +103,7 @@ Built natively in Kotlin, the app uses Firebase Authentication for secure auth, 
 The data model handles complex relational structures across multiple collections — users, posts, likes, reposts, follow relationships, messaging threads, and notifications — while minimizing read operations. The follow system powers both personalized feed generation and notification triggers for social interactions.`,
     stack: [
       'Kotlin', 'Android', 'Firebase Auth',
-      'Cloud Firestore', 'Imgur API', 'Jetpack', 'MVVM'
+      'Cloud Firestore', 'Imgur API', 'MVVM',
     ],
     highlights: [
       'Real-time messaging with Firestore snapshot listeners — instant delivery without polling',
@@ -78,6 +112,29 @@ The data model handles complex relational structures across multiple collections
       'Image pipeline through Imgur API keeps binary data out of Firestore, minimizing read costs',
       'Fully customizable artist profiles with portfolio galleries and social stats',
       'NoSQL data model optimized for free-tier quota constraints across 6+ collections',
+    ],
+    media: [
+      {
+        type: 'video',
+        src: '/media/pixelaura/demo.mp4',
+        poster: '/images/projects/pixelaura/poster.jpg',
+        caption: 'App walkthrough — feed, profiles, and messaging',
+      },
+      {
+        type: 'image',
+        src: '/images/projects/pixelaura/feed.jpg',
+        caption: 'Artist feed',
+      },
+      {
+        type: 'image',
+        src: '/images/projects/pixelaura/profile.jpg',
+        caption: 'Profile & portfolio gallery',
+      },
+      {
+        type: 'image',
+        src: '/images/projects/pixelaura/messages.jpg',
+        caption: 'Real-time messaging',
+      },
     ],
     image: '/images/projects/pixelaura.jpg',
     accent: '#FF6B9D',
@@ -103,7 +160,7 @@ Built in Unity, the architecture centers on persistent singleton managers (GameM
 The Bakunawa — a Filipino sea serpent — serves as the ultimate consequence: 100% pollution triggers permanent save deletion. The world also references four Philippine environmental laws (RA 8550, 9003, 9275, 9147) through NPC dialogue and in-game consequences.`,
     stack: [
       'Unity', 'C#', 'Unity NavMesh', 'ScriptableObjects',
-      'Unity Animator', 'Unity Physics', 'Custom Save System', 'FMOD'
+      'Unity Animator', 'Unity Physics', 'Custom Save System',
     ],
     highlights: [
       'Dual-currency loop: ecological (karma, pollution) and economic (PHP) systems are in constant tension',
@@ -114,6 +171,29 @@ The Bakunawa — a Filipino sea serpent — serves as the ultimate consequence: 
       'Fishdex, Encounters, and Achievement systems tracking 10+ achievements per save slot',
       'SHA256 checksum save verification with atomic writes preventing data corruption',
       'References real Philippine environmental laws: RA 8550, 9003, 9275, 9147, 7586',
+    ],
+    media: [
+      {
+        type: 'video',
+        src: '/media/lusong/demo.mp4',
+        poster: '/images/projects/lusong/poster.jpg',
+        caption: 'Gameplay demo — fishing, pollution system, and Bakunawa encounter',
+      },
+      {
+        type: 'image',
+        src: '/images/projects/lusong/world.jpg',
+        caption: 'Open-world Philippine sea environment',
+      },
+      {
+        type: 'image',
+        src: '/images/projects/lusong/inventory.jpg',
+        caption: 'Grid-based inventory system',
+      },
+      {
+        type: 'image',
+        src: '/images/projects/lusong/pollution.jpg',
+        caption: 'Pollution system — fog and mutant fish',
+      },
     ],
     image: '/images/projects/lusong.jpg',
     accent: '#3ECFB2',
