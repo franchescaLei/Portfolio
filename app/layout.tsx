@@ -4,9 +4,9 @@ import { ModeProvider } from '@/components/ui/ModeProvider'
 import SmoothScrollProvider from '@/components/ui/SmoothScrollProvider'
 
 export const metadata: Metadata = {
-  title: 'Your Name — Full-Stack · Mobile · Game Developer',
+  title: 'Franchesca Lei Demisana — Full-Stack · Mobile · Game Developer',
   description:
-    'Portfolio of a versatile software developer working across full-stack web, mobile, and game development.',
+    'Portfolio of Franchesca Lei Demisana, a versatile software developer working across full-stack web, mobile, and game development.',
 }
 
 export default function RootLayout({

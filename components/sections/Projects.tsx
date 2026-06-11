@@ -14,7 +14,6 @@ const CATEGORY_ICONS: Record<string, string> = {
 
 /* ══════════════════════════════════════════════════════════════════════
    MediaCarousel
-   Renders a horizontal slider supporting video and image items.
    ══════════════════════════════════════════════════════════════════════ */
 function MediaCarousel({ media, accent }: { media: ProjectMedia[]; accent: string }) {
   const [current, setCurrent] = useState(0)
@@ -22,7 +21,6 @@ function MediaCarousel({ media, accent }: { media: ProjectMedia[]; accent: strin
   const prev = useCallback(() => setCurrent(i => (i - 1 + media.length) % media.length), [media.length])
   const next = useCallback(() => setCurrent(i => (i + 1) % media.length), [media.length])
 
-  // Keyboard navigation when carousel is focused
   const handleKey = (e: React.KeyboardEvent) => {
     if (e.key === 'ArrowLeft') prev()
     if (e.key === 'ArrowRight') next()
@@ -31,212 +29,232 @@ function MediaCarousel({ media, accent }: { media: ProjectMedia[]; accent: strin
   const item = media[current]
 
   return (
-    <div
-      className="rounded-xl overflow-hidden"
-      style={{ border: `1px solid var(--color-border)` }}
-      onKeyDown={handleKey}
-      tabIndex={0}
-      aria-label="Project media carousel"
-    >
-      {/* Main media area */}
+    /* Constrain carousel to ~70% of card width, centered */
+    <div style={{ maxWidth: '72%', margin: '0 auto' }}>
       <div
-        className="relative w-full"
-        style={{ backgroundColor: '#000', aspectRatio: '16/9' }}
+        className="rounded-xl overflow-hidden"
+        style={{ border: `1px solid var(--color-border)` }}
+        onKeyDown={handleKey}
+        tabIndex={0}
+        aria-label="Project media carousel"
       >
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={current}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
-            className="absolute inset-0 flex items-center justify-center"
-          >
-            {item.type === 'video' ? (
-              <video
-                src={item.src}
-                poster={item.poster}
-                controls
-                playsInline
-                preload="metadata"
-                style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
-              />
-            ) : (
-              /* eslint-disable-next-line @next/next/no-img-element */
-              <img
-                src={item.src}
-                alt={item.caption ?? `Project screenshot ${current + 1}`}
-                style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
-              />
-            )}
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Type badge */}
+        {/* Main media area */}
         <div
-          className="absolute top-3 left-3 flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-mono"
-          style={{
-            backgroundColor: 'rgba(0,0,0,0.65)',
-            backdropFilter: 'blur(8px)',
-            color: item.type === 'video' ? accent : '#fff',
-            letterSpacing: '0.06em',
-          }}
+          className="relative w-full"
+          style={{ backgroundColor: '#000', aspectRatio: '16/9' }}
         >
-          {item.type === 'video' ? '▶ Video' : '◻ Image'}
-        </div>
-
-        {/* Prev / Next arrows — only if more than 1 item */}
-        {media.length > 1 && (
-          <>
-            <button
-              onClick={prev}
-              aria-label="Previous"
-              style={{
-                position: 'absolute',
-                left: 12,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                width: 36,
-                height: 36,
-                borderRadius: '50%',
-                border: 'none',
-                backgroundColor: 'rgba(0,0,0,0.5)',
-                backdropFilter: 'blur(6px)',
-                color: '#fff',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 16,
-                transition: 'background 0.2s',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.backgroundColor = `${accent}CC`)}
-              onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.5)')}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={current}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="absolute inset-0 flex items-center justify-center"
             >
-              ‹
-            </button>
-            <button
-              onClick={next}
-              aria-label="Next"
-              style={{
-                position: 'absolute',
-                right: 12,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                width: 36,
-                height: 36,
-                borderRadius: '50%',
-                border: 'none',
-                backgroundColor: 'rgba(0,0,0,0.5)',
-                backdropFilter: 'blur(6px)',
-                color: '#fff',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 16,
-                transition: 'background 0.2s',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.backgroundColor = `${accent}CC`)}
-              onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.5)')}
-            >
-              ›
-            </button>
-          </>
-        )}
-
-        {/* Counter */}
-        {media.length > 1 && (
-          <div
-            className="absolute bottom-3 right-3 text-xs font-mono"
-            style={{
-              backgroundColor: 'rgba(0,0,0,0.55)',
-              backdropFilter: 'blur(6px)',
-              color: '#fff',
-              padding: '2px 8px',
-              borderRadius: 4,
-              letterSpacing: '0.06em',
-            }}
-          >
-            {current + 1} / {media.length}
-          </div>
-        )}
-      </div>
-
-      {/* Caption */}
-      {item.caption && (
-        <div
-          className="px-4 py-2.5 text-xs font-mono"
-          style={{
-            color: 'var(--color-ink-faint)',
-            borderTop: '1px solid var(--color-border)',
-            letterSpacing: '0.04em',
-          }}
-        >
-          {item.caption}
-        </div>
-      )}
-
-      {/* Thumbnail strip — only if 2+ items */}
-      {media.length > 1 && (
-        <div
-          className="flex gap-2 px-4 py-3 overflow-x-auto"
-          style={{ borderTop: '1px solid var(--color-border)' }}
-        >
-          {media.map((m, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrent(i)}
-              aria-label={`Go to slide ${i + 1}`}
-              style={{
-                flexShrink: 0,
-                width: 56,
-                height: 36,
-                borderRadius: 6,
-                overflow: 'hidden',
-                border: `2px solid ${i === current ? accent : 'transparent'}`,
-                cursor: 'pointer',
-                background: '#000',
-                padding: 0,
-                transition: 'border-color 0.2s',
-              }}
-            >
-              {m.type === 'video' ? (
-                // Poster or dark placeholder for video thumbnails
-                m.poster ? (
-                  /* eslint-disable-next-line @next/next/no-img-element */
-                  <img
-                    src={m.poster}
-                    alt=""
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                  />
-                ) : (
-                  <div
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: 14,
-                      color: i === current ? accent : '#666',
-                    }}
-                  >
-                    ▶
-                  </div>
-                )
+              {item.type === 'video' ? (
+                <video
+                  src={item.src}
+                  poster={item.poster}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+                />
               ) : (
                 /* eslint-disable-next-line @next/next/no-img-element */
                 <img
-                  src={m.src}
-                  alt=""
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  src={item.src}
+                  alt={item.caption ?? `Project screenshot ${current + 1}`}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
                 />
               )}
-            </button>
-          ))}
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Type badge */}
+          <div
+            className="absolute top-3 left-3 flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-mono"
+            style={{
+              backgroundColor: 'rgba(0,0,0,0.65)',
+              backdropFilter: 'blur(8px)',
+              color: item.type === 'video' ? accent : '#fff',
+              letterSpacing: '0.06em',
+            }}
+          >
+            {item.type === 'video' ? '▶ Video' : '◻ Image'}
+          </div>
+
+          {/* Prev / Next arrows */}
+          {media.length > 1 && (
+            <>
+              <button
+                onClick={prev}
+                aria-label="Previous"
+                style={{
+                  position: 'absolute',
+                  left: 12,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: 34,
+                  height: 34,
+                  borderRadius: 6,
+                  border: `1px solid rgba(255,255,255,0.18)`,
+                  backgroundColor: 'rgba(0,0,0,0.55)',
+                  backdropFilter: 'blur(8px)',
+                  color: '#fff',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 13,
+                  fontFamily: 'var(--font-mono)',
+                  letterSpacing: 0,
+                  transition: 'background 0.2s, border-color 0.2s',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.backgroundColor = `${accent}CC`
+                  e.currentTarget.style.borderColor = accent
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.55)'
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)'
+                }}
+              >
+                ←
+              </button>
+              <button
+                onClick={next}
+                aria-label="Next"
+                style={{
+                  position: 'absolute',
+                  right: 12,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  width: 34,
+                  height: 34,
+                  borderRadius: 6,
+                  border: `1px solid rgba(255,255,255,0.18)`,
+                  backgroundColor: 'rgba(0,0,0,0.55)',
+                  backdropFilter: 'blur(8px)',
+                  color: '#fff',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 13,
+                  fontFamily: 'var(--font-mono)',
+                  letterSpacing: 0,
+                  transition: 'background 0.2s, border-color 0.2s',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.backgroundColor = `${accent}CC`
+                  e.currentTarget.style.borderColor = accent
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.backgroundColor = 'rgba(0,0,0,0.55)'
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.18)'
+                }}
+              >
+                →
+              </button>
+            </>
+          )}
+
+          {/* Counter */}
+          {media.length > 1 && (
+            <div
+              className="absolute bottom-3 right-3 text-xs font-mono"
+              style={{
+                backgroundColor: 'rgba(0,0,0,0.55)',
+                backdropFilter: 'blur(6px)',
+                color: '#fff',
+                padding: '2px 8px',
+                borderRadius: 4,
+                letterSpacing: '0.06em',
+                border: '1px solid rgba(255,255,255,0.1)',
+              }}
+            >
+              {current + 1} / {media.length}
+            </div>
+          )}
         </div>
-      )}
+
+        {/* Caption */}
+        {item.caption && (
+          <div
+            className="px-4 py-2.5 text-xs font-mono"
+            style={{
+              color: 'var(--color-ink-faint)',
+              borderTop: '1px solid var(--color-border)',
+              letterSpacing: '0.04em',
+            }}
+          >
+            {item.caption}
+          </div>
+        )}
+
+        {/* Thumbnail strip */}
+        {media.length > 1 && (
+          <div
+            className="flex gap-2 px-4 py-3 overflow-x-auto"
+            style={{ borderTop: '1px solid var(--color-border)' }}
+          >
+            {media.map((m, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrent(i)}
+                aria-label={`Go to slide ${i + 1}`}
+                style={{
+                  flexShrink: 0,
+                  width: 52,
+                  height: 34,
+                  borderRadius: 5,
+                  overflow: 'hidden',
+                  border: `2px solid ${i === current ? accent : 'transparent'}`,
+                  cursor: 'pointer',
+                  background: '#000',
+                  padding: 0,
+                  transition: 'border-color 0.2s',
+                  opacity: i === current ? 1 : 0.55,
+                }}
+              >
+                {m.type === 'video' ? (
+                  m.poster ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
+                    <img
+                      src={m.poster}
+                      alt=""
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: 13,
+                        color: i === current ? accent : '#666',
+                      }}
+                    >
+                      ▶
+                    </div>
+                  )
+                ) : (
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
+                    src={m.src}
+                    alt=""
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  />
+                )}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }
@@ -251,8 +269,6 @@ export default function Projects() {
   const inView = useInView(ref, { once: true, margin: '-100px' })
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
 
-
-  /* ── Default layout (professional + playful) ── */
   return (
     <section
       id="projects"
@@ -342,7 +358,6 @@ function MinimalProjectRow({
       animate={inView ? { opacity: 1 } : {}}
       transition={{ duration: 0.4, delay: index * 0.08 }}
     >
-      {/* Row header — click to expand */}
       <div
         onClick={() => setExpanded(!expanded)}
         style={{
@@ -357,7 +372,6 @@ function MinimalProjectRow({
         role="button"
         aria-expanded={expanded}
       >
-        {/* Index */}
         <span
           style={{
             fontFamily: 'var(--font-mono)',
@@ -369,7 +383,6 @@ function MinimalProjectRow({
           {String(index + 1).padStart(2, '0')}
         </span>
 
-        {/* Title + meta */}
         <div>
           <p
             style={{
@@ -412,7 +425,6 @@ function MinimalProjectRow({
           </div>
         </div>
 
-        {/* Toggle + links */}
         <div className="flex items-center gap-4">
           {project.githubUrl && (
             <a
@@ -450,7 +462,6 @@ function MinimalProjectRow({
         </div>
       </div>
 
-      {/* Expandable body */}
       <AnimatePresence>
         {expanded && (
           <motion.div
@@ -461,13 +472,11 @@ function MinimalProjectRow({
             style={{ overflow: 'hidden' }}
           >
             <div style={{ padding: '32px 0 40px', display: 'flex', flexDirection: 'column', gap: '32px' }}>
-              {/* Media carousel */}
               {project.media && project.media.length > 0 && (
                 <MediaCarousel media={project.media} accent={project.accent} />
               )}
 
               <div className="grid lg:grid-cols-[1fr_1fr] gap-12">
-                {/* Description */}
                 <div>
                   <p
                     style={{
@@ -485,7 +494,6 @@ function MinimalProjectRow({
                     {project.description}
                   </p>
 
-                  {/* Stack */}
                   <div style={{ marginTop: '20px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                     {project.stack.map(tech => (
                       <span key={tech} className="tech-tag">{tech}</span>
@@ -493,7 +501,6 @@ function MinimalProjectRow({
                   </div>
                 </div>
 
-                {/* Highlights */}
                 <div>
                   <p
                     style={{

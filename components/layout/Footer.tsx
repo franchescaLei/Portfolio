@@ -16,12 +16,12 @@ export default function Footer() {
           className="text-sm"
           style={{ color: 'var(--color-ink-faint)', fontFamily: 'var(--font-mono)' }}
         >
-          © {new Date().getFullYear()} Your Name. Designed & built with care.
+          © {new Date().getFullYear()} Franchesca Lei T. Demisana. Designed & built with care.
         </p>
         <div className="flex items-center gap-6">
           {[
-            { label: 'GitHub', href: 'https://github.com/yourusername' },
-            { label: 'Email', href: 'mailto:your@email.com' },
+            { label: 'GitHub', href: 'https://github.com/franchescaLei/' },
+            { label: 'Email', href: 'mailto:franchescademisana@gmail.com' },
           ].map(link => (
             <a
               key={link.label}
