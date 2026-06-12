@@ -98,7 +98,7 @@ Every board change, comment, and notification is pushed to all connected clients
     image: '/images/projects/scrum-board.jpg',
     accent: '#4A7AFF',
     accentDark: '#3A6AEF',
-    liveUrl: 'https://digital-scrum-board-front-end.vercel.app',
+    liveUrl: 'https://digital-scrum-board-front-end-11wc.vercel.app',
     githubUrl: 'https://github.com/franchescaLei/Digital-Scrum-Board---FrontEnd',
     year: '2026',
     status: 'Live',
